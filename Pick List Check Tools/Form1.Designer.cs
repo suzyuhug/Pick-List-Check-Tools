@@ -29,21 +29,12 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.button1 = new System.Windows.Forms.Button();
             this.loglabel = new System.Windows.Forms.Label();
             this.PONumLabel = new System.Windows.Forms.Label();
             this.PB = new System.Windows.Forms.ProgressBar();
+            this.printDialog1 = new System.Windows.Forms.PrintDialog();
+            this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.SuspendLayout();
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(590, 117);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(97, 31);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // loglabel
             // 
@@ -52,7 +43,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.loglabel.Location = new System.Drawing.Point(2, 52);
             this.loglabel.Name = "loglabel";
-            this.loglabel.Size = new System.Drawing.Size(260, 16);
+            this.loglabel.Size = new System.Drawing.Size(257, 18);
             this.loglabel.TabIndex = 2;
             this.loglabel.Text = "log";
             this.loglabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -73,20 +64,24 @@
             this.PB.Size = new System.Drawing.Size(214, 8);
             this.PB.TabIndex = 4;
             // 
+            // printDialog1
+            // 
+            this.printDialog1.UseEXDialog = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(266, 79);
+            this.ClientSize = new System.Drawing.Size(263, 81);
             this.Controls.Add(this.PB);
             this.Controls.Add(this.PONumLabel);
             this.Controls.Add(this.loglabel);
-            this.Controls.Add(this.button1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "PO校验工具";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -94,11 +89,11 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label loglabel;
         private System.Windows.Forms.Label PONumLabel;
         private System.Windows.Forms.ProgressBar PB;
+        private System.Windows.Forms.PrintDialog printDialog1;
+        private System.Drawing.Printing.PrintDocument printDocument1;
     }
 }
 

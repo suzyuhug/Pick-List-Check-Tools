@@ -55,7 +55,7 @@ namespace Pick_List_Check_Tools
         public static DataTable csv2dt(string filePath, int n,DataTable dt)
         {
             //DataTable dt = new DataTable();
-            StreamReader reader = new StreamReader(filePath, System.Text.Encoding.UTF8, false);
+            StreamReader reader = new StreamReader(filePath, System.Text.Encoding.Unicode, false);
             int i = 0, m = 0;
             reader.Peek();
             while (reader.Peek() > 0)

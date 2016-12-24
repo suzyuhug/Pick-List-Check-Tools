@@ -1,18 +1,19 @@
 ﻿
-using NPOI.HPSF;
+
+
+using System.Drawing;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+
 using System.Data;
-using System.Drawing;
+
 using System.IO;
-using System.Linq;
-using System.Text;
+
 using System.Threading;
 using System.Windows.Forms;
+using System.Drawing.Printing;
 
 namespace Pick_List_Check_Tools
 {
@@ -25,17 +26,7 @@ namespace Pick_List_Check_Tools
 
 
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-          
-
-
-            string filepath = @"d:\456.xls";
-            ExcelToDataTable(filepath, false);
-
-
-        }
+      
         private void ExcelToDataTable(string filePath, bool isColumnName)
         {
 
@@ -54,8 +45,10 @@ namespace Pick_List_Check_Tools
                 dt.Columns.Add("Item Number", typeof(string));
                 dt.Columns.Add("Component", typeof(string));
                 dt.Columns.Add("Category", typeof(string));
-                dt.Columns.Add("E Qty", typeof(string));
+                dt.Columns.Add("E Qty", typeof(string)); 
+                dt.Columns.Add("Status", typeof(string));
                 dt = CsvHelper.csv2dt($"{Application.StartupPath.ToString()}\\csv.csv", 1, dt);
+              
 
                 //=================================================================================================
 
@@ -149,14 +142,33 @@ namespace Pick_List_Check_Tools
 
 
 
+                                    
+
+                                  
+                                    sheet.GetRow(1).CreateCell(14).SetCellValue("电源：");
+                                    sheet.GetRow(1).CreateCell(15).SetCellValue("无");
+                                    sheet.GetRow(2).CreateCell(14).SetCellValue("DSP：");
+                                    sheet.GetRow(2).CreateCell(15).SetCellValue("无");
+                                    sheet.GetRow(3).CreateCell(14).SetCellValue("散热片：");
+                                    sheet.GetRow(3).CreateCell(15).SetCellValue("无");
 
 
-                                    // MessageBox.Show($"{itemid.ToString()}  {compoentid.ToString()}  {eqtyid.ToString()}  {categoryid.ToString()}    {mccheckid.ToString()}");
+                                    FileStream file = new FileStream(filePath, FileMode.Create);
+                            workbook.Write(file);
+                            file.Close();
 
-                                    //======================================================================================================================
 
 
-                                    PB.Maximum = rowCount * cellCount-2;
+
+
+
+
+                            // MessageBox.Show($"{itemid.ToString()}  {compoentid.ToString()}  {eqtyid.ToString()}  {categoryid.ToString()}    {mccheckid.ToString()}");
+
+                            //======================================================================================================================
+
+
+                            PB.Maximum = rowCount * cellCount-2;
 
                                     for (int i = Header + 1; i <= rowCount; ++i)
                                     {
@@ -164,7 +176,7 @@ namespace Pick_List_Check_Tools
                                         if (row == null) continue;
 
                                         // dataRow = dataTable.NewRow();
-                                        bool itembool = false, compoentbool = false, eqtybool = false, categorybool = false;
+                                        string itemstr = null, compoentstr = null, eqtystr = null, categorystr = null;
                                         for (int j = row.FirstCellNum; j < cellCount; ++j)
                                         {
                                             PB.Value = PB.Value + 1;
@@ -193,57 +205,103 @@ namespace Pick_List_Check_Tools
                                                 //DataRow[] ExistpoArr;
                                                 loglabel.Text = $"正在对比数据：{strvalue}";
                                                 Application.DoEvents();
+
                                                 if (j == itemid)
                                                 {
-                                                    DataRow[] ExistpoArr = dt.Select("[Item Number]='" + strvalue + "'");
-                                                    if (ExistpoArr.Length > 0)
-                                                    {
-                                                        itembool = true;
-                                                    }
+                                                    itemstr = strvalue;
                                                 }
 
                                                 if (j == compoentid)
                                                 {
-                                                    DataRow[] ExistpoArr = dt.Select("Component='" + strvalue + "'");
-                                                    if (ExistpoArr.Length > 0)
-                                                    {
+                                                    compoentstr = strvalue;
 
-                                                        compoentbool = true;
-                                                    }
                                                 }
                                                 if (j == eqtyid)
                                                 {
-                                                    DataRow[] ExistpoArr = dt.Select("[E Qty]='" + strvalue + "'");
-                                                    if (ExistpoArr.Length > 0)
-                                                    {
-                                                        eqtybool = true;
-                                                    }
+                                                    eqtystr = strvalue;
                                                 }
                                                 if (j == categoryid)
                                                 {
-                                                    DataRow[] ExistpoArr = dt.Select("Category='" + strvalue + "'");
-                                                    if (ExistpoArr.Length > 0)
-                                                    {
-                                                        categorybool = true;
-                                                    }
+                                                    categorystr = strvalue;
                                                 }
                                             }
                                         }
-
-                                        if (itembool && compoentbool && eqtybool && categorybool)
+                                        bool bl = false; string dtStatus = null;
+                                        bool dspbool = false, powerbool = false, hebool = false;
+                                        if (itemstr != null && compoentstr != null && eqtystr != null && categorystr != null)
                                         {
-                                            loglabel.Text = $"正在写入：EM";
-                                            Application.DoEvents();
-                                            sheet.GetRow(i).GetCell(mccheckid).SetCellValue("东方不败");
-                                            //row.CreateCell(mccheckid).SetCellValue("EM");
-                                            FileStream file = new FileStream(filePath, FileMode.Create);
+                                            for (int n = 0; n < dt.Rows.Count; n++)
+                                            {
+                                                string dtitem = dt.Rows[n]["Item Number"].ToString();
+                                                string dtcomt = dt.Rows[n]["Component"].ToString();
+                                                string dtcate = dt.Rows[n]["Category"].ToString();
+                                                string dteqty = dt.Rows[n]["E Qty"].ToString();
+                                                dtStatus = dt.Rows[n]["Status"].ToString();
+                                                if (dtitem == itemstr && dtcomt == compoentstr && dtcate == categorystr && dteqty == eqtystr)
+                                                {
+                                                    if (compoentstr == "TDN-601-979-18") powerbool = true;
+                                                    if (compoentstr == "TDN-873-572-21") hebool = true;
+                                                    if (compoentstr == "TDN-624-103-00") dspbool = true;
+                                                    bl = true;
+                                                    break;
+                                                }
 
-                                            workbook.Write(file);
-                                            file.Close();
+
+
+                                            }
+
                                         }
+
+
+                                        if (bl)
+                                        {
+                                            loglabel.Text = $"正在写入：{dtStatus}";
+
+                                            Application.DoEvents();
+                                            sheet.GetRow(i).GetCell(mccheckid).SetCellValue(dtStatus);
+                                            //row.CreateCell(mccheckid).SetCellValue("EM");
+
+                                            if (powerbool)
+                                            {
+                                                sheet.GetRow(1).CreateCell(14).SetCellValue("电源：");
+                                                sheet.GetRow(1).CreateCell(15).SetCellValue("有");
+                                               
+                                            }
+                                            if (dspbool)
+                                            {
+                                                
+                                                sheet.GetRow(2).CreateCell(14).SetCellValue("DSP：");
+                                                sheet.GetRow(2).CreateCell(15).SetCellValue("有");
+                                               
+
+
+                                            }
+                                            if (hebool)
+                                            {
+                                               
+                                                sheet.GetRow(3).CreateCell(14).SetCellValue("散热片：");
+                                                sheet.GetRow(3).CreateCell(15).SetCellValue("有");
+
+
+                                            }
+                                            FileStream file1 = new FileStream(filePath, FileMode.Create);
+
+                                            workbook.Write(file1);
+                                            file1.Close();
+
+
+                                        }
+
 
                                         //dataTable.Rows.Add(dataRow);
                                     }
+
+                                    //======================================打印文件==============================================
+
+                                    PrintPriviewExcelFile(filePath);
+
+
+
                                 }
                                 else
                                 {
@@ -260,7 +318,7 @@ namespace Pick_List_Check_Tools
                 this.Dispose(); 
                 Application.Exit();
 
-            }
+        }
             catch (Exception)
             {
                 if (fs != null)
@@ -270,14 +328,15 @@ namespace Pick_List_Check_Tools
                     MessageBox.Show("PO文件校验错误，原因不详！", "PO校验工具", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     this.Close();
                     this.Dispose();
-                    Application.Exit();
+        Application.Exit();
                 }
-                // return null;
-            }
+    // return null;
+}
         }
         Thread thread;
         private void Form1_Load(object sender, EventArgs e)
         {
+            UpdateClass.UpdateFrom("PickList-Tool");
             int ScreenWidth = Screen.PrimaryScreen.WorkingArea.Width;
             int ScreenHeight = Screen.PrimaryScreen.WorkingArea.Height;
             int x = ScreenWidth - this.Width - 5;
@@ -299,6 +358,28 @@ namespace Pick_List_Check_Tools
             });
             thread.Abort();
 
+        }
+
+
+        public void PrintPriviewExcelFile(string filePath)
+        {
+            Microsoft.Office.Interop.Excel.Application myexcel = new Microsoft.Office.Interop.Excel.Application();
+            myexcel.Visible = false;
+            myexcel.Application.DisplayAlerts = false;
+            myexcel.Workbooks.Open(filePath);
+            Microsoft.Office.Interop.Excel.Worksheet mysheet = (Microsoft.Office.Interop.Excel.Worksheet)myexcel.Worksheets[1];
+            mysheet.Activate();
+
+
+            myexcel.ActiveSheet.PrintOut();
+            myexcel.Workbooks.Close();
+            myexcel.Quit();
+
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+          
         }
     }
 }
